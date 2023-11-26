@@ -75,6 +75,7 @@ pad2: .res 1
     LDX #$20
     JSR draw_starfield
     JSR display_health1
+    JSR display_health2
 
   vblankwait:       ; wait for another vblank before continuing
     BIT PPUSTATUS
@@ -992,6 +993,15 @@ pad2: .res 1
 
     move_left: 
       ; stop the character from moving beyond left border
+      LDA player2_y
+      CMP player1_y
+      BNE borderl
+
+      LDA player2_x
+      CMP player1_x
+      BEQ check_right
+
+      borderl:
       LDX player2_x
       CPX #$02
       BCS Continue_left2
@@ -1000,10 +1010,6 @@ pad2: .res 1
       DEC player2_x
       DEC player2_x
 
-
-      LDA player2_air
-      CMP #$01
-      BNE check_right
 
   check_right:
     LDA pad2        ; load button presses
@@ -1112,6 +1118,16 @@ pad2: .res 1
     move_right:
 
       ; stop the character from moving beyond left border
+
+      LDA player2_y
+      CMP player1_y
+      BNE borderr
+
+      LDA player2_x
+      CMP player1_x
+      BEQ check_start
+
+      borderr:
       LDX player2_x
       CPX #$F0
       BCC Continue_right
@@ -1126,7 +1142,7 @@ pad2: .res 1
 
   check_start:
 
-    LDA pad1
+    LDA pad2
     AND #BTN_START
     BEQ check_a
 
@@ -1371,13 +1387,44 @@ pad2: .res 1
 
     LDA player2_health
     CMP #$AA
-    BPL health13
+    BPL health23
     CMP #$55
-    BPL health12
+    BPL health22
     CMP #$00
-    BPL health11
+    BPL health21
 
-    health13:
+    health23:
+
+    LDA #$1F
+    STA $0230 ; Y-coord of first sprite
+    LDA #$20
+    STA $0231 ; tile number of first sprite
+    LDA #%00000010
+    STA $0232 ; attributes of first sprite
+    LDA #$DF
+    STA $0233 ; X-coord of first sprite
+
+    LDA #$27
+    STA $0234 ; Y-coord of first sprite
+    LDA #$20
+    STA $0235 ; tile number of first sprite
+    LDA #%00000010
+    STA $0236 ; attributes of first sprite
+    LDA #$DF
+    STA $0237 ; X-coord of first sprite
+
+    LDA #$2F
+    STA $0238 ; Y-coord of first sprite
+    LDA #$20
+    STA $0239 ; tile number of first sprite
+    LDA #%00000010
+    STA $023A ; attributes of first sprite
+    LDA #$DF
+    STA $023B ; X-coord of first sprite
+
+    JMP done_health2 
+
+    health22:
 
     LDA #$1F
     STA $0230 ; Y-coord of first sprite
@@ -1385,7 +1432,7 @@ pad2: .res 1
     STA $0231 ; tile number of first sprite
     LDA #$02
     STA $0232 ; attributes of first sprite
-    LDA #$1F
+    LDA #$DF
     STA $0233 ; X-coord of first sprite
 
     LDA #$27
@@ -1394,38 +1441,7 @@ pad2: .res 1
     STA $0235 ; tile number of first sprite
     LDA #$02
     STA $0236 ; attributes of first sprite
-    LDA #$1F
-    STA $0237 ; X-coord of first sprite
-
-    LDA #$2F
-    STA $0238 ; Y-coord of first sprite
-    LDA #$20
-    STA $0239 ; tile number of first sprite
-    LDA #$02
-    STA $023A ; attributes of first sprite
-    LDA #$1F
-    STA $023B ; X-coord of first sprite
-
-    JMP done_health 
-
-    health12:
-
-    LDA #$1F
-    STA $0230 ; Y-coord of first sprite
-    LDA #$20
-    STA $0231 ; tile number of first sprite
-    LDA #$02
-    STA $0232 ; attributes of first sprite
-    LDA #$1F
-    STA $0233 ; X-coord of first sprite
-
-    LDA #$27
-    STA $0234 ; Y-coord of first sprite
-    LDA #$20
-    STA $0235 ; tile number of first sprite
-    LDA #$02
-    STA $0236 ; attributes of first sprite
-    LDA #$1F
+    LDA #$DF
     STA $0237 ; X-coord of first sprite
 
     LDA #$2F
@@ -1434,13 +1450,13 @@ pad2: .res 1
     STA $0239 ; tile number of first sprite
     LDA #$02
     STA $023A ; attributes of first sprite
-    LDA #$00
+    LDA #$DF
     STA $023B ; X-coord of first sprite
 
-    JMP done_health
+    JMP done_health2
 
 
-    health11:
+    health21:
 
     LDA #$1F
     STA $0230 ; Y-coord of first sprite
@@ -1448,7 +1464,7 @@ pad2: .res 1
     STA $0231 ; tile number of first sprite
     LDA #$02
     STA $0232 ; attributes of first sprite
-    LDA #$1F
+    LDA #$DF
     STA $0233 ; X-coord of first sprite
 
     LDA #$27
@@ -1457,7 +1473,7 @@ pad2: .res 1
     STA $0235 ; tile number of first sprite
     LDA #$02
     STA $0236 ; attributes of first sprite
-    LDA #$00
+    LDA #$DF
     STA $0237 ; X-coord of first sprite
 
     LDA #$2F
@@ -1466,10 +1482,10 @@ pad2: .res 1
     STA $0239 ; tile number of first sprite
     LDA #$02
     STA $023A ; attributes of first sprite
-    LDA #$00
+    LDA #$DF
     STA $023B ; X-coord of first sprite
 
-    done_health:
+    done_health2:
 
     PLA
     TAY
